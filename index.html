@@ -78,7 +78,7 @@ const whatsapp = 'https://chat.whatsapp.com/HBiIhE2yKAXJFXNSzu3Ac1';
 function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function notice(msg, kind='notice', target='globalNotice'){const el=document.getElementById(target);if(!el)return;el.className=kind+' show';el.textContent=msg;}
 function clearNotice(target){const el=document.getElementById(target);if(el){el.classList.remove('show');el.textContent='';}}
-function showView(id){['homeView','driversView','profileView','convoyView','dashboardView','financeView','tripsView','noticesView','applyView','managementView'].forEach(v=>document.getElementById(v).classList.toggle('hidden',v!==id));window.scrollTo({top:0,behavior:'smooth'});}
+function showView(id){document.getElementById('rvView')?.classList.add('hidden');['homeView','driversView','profileView','convoyView','dashboardView','financeView','tripsView','noticesView','applyView','managementView'].forEach(v=>document.getElementById(v).classList.toggle('hidden',v!==id));window.scrollTo({top:0,behavior:'smooth'});}
 function friendlyError(error){let m=error?.message||String(error||'Erro desconhecido');if(/Invalid login credentials/i.test(m))return 'E-mail ou senha incorretos.';if(/Failed to fetch/i.test(m))return 'Não foi possível conectar. Confira a URL e a chave do Supabase em config.js.';return m;}
 async function start(){
  if(!supabaseLib?.createClient){loginError.textContent='A biblioteca do Supabase não carregou. Confira sua conexão e recarregue a página.';loginError.classList.add('show');return;}
@@ -208,6 +208,7 @@ H('noticeForm').addEventListener('submit',async e=>{e.preventDefault();if(!isMan
 H('applyForm').addEventListener('submit',async e=>{e.preventDefault();await hubSave(e.target,'join_applications',f=>({name:String(f.get('name')).trim(),discord:String(f.get('discord')).trim(),steam:String(f.get('steam')).trim(),experience:f.get('experience'),message:String(f.get('message')).trim(),user_id:state.user.id,status:'pending'}),'applyMsg');});
 H('managementView').addEventListener('click',async e=>{const b=e.target.closest('.hub-decide');if(!b||!isManager())return;const {table,id,status}=b.dataset;if(!['join_applications','trips','event_participations'].includes(table)||!['approved','rejected'].includes(status))return;const {error}=await state.client.from(table).update({status}).eq('id',id);if(error){hubAlert('managementMsg',friendlyError(error),true);return;}await hubRefresh();hubAlert('managementMsg','Status atualizado.');});
 
+window.RavieraLegacy = {state, hub, showView, hubRefresh};
 start().catch(e=>{loginError.textContent=friendlyError(e);loginError.classList.add('show');});
 })();
 </script>
